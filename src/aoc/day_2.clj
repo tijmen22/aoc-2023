@@ -2,10 +2,6 @@
   (:require [clojure.java.io :as io]
             [clojure.string :as str]))
 
-(def RULES {"red"   12
-            "green" 13
-            "blue"  14})
-
 (defn- parse-set [set]
   (let [[quantity type] (str/split set #" ")]
     {:set/quantity (Integer. quantity)
@@ -16,22 +12,20 @@
     {:game/id (-> (str/split id #" ") (last) (Integer.))
      :game/sets (map parse-set sets)}))
 
-(defn- max-quantity [set]
-  (get RULES (:set/type set)))
-
-(defn- possible-set? [set]
-  (<= (:set/quantity set) (max-quantity set)))
-
-(defn- possible-game? [game]
-  (every? possible-set? (:game/sets game)))
+(defn- power [game]
+  (->> (group-by :set/type (:game/sets game))
+       (vals)
+       (map #(map :set/quantity %))
+       (map #(apply max %))
+       (apply *)))
 
 (comment
   (with-open [rdr (io/reader "resources/day_2.csv")]
     (->> (into [] (line-seq rdr))
          (map parse-line)
-         (keep #(when (possible-game? %) (:game/id %)))
+         (map power)
          (apply +)))
-  ;; => 2771
+  ;; => 70924
 
   ;;
   )
