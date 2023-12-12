@@ -9,7 +9,7 @@
    "KTJJT 220"
    "QQQJA 483"])
 
-(def ORDER (str/reverse "AKQJT98765432"))
+(def ORDER (str/reverse "AKQT98765432J"))
 
 (defn parse-line [l]
   (str/split l #" "))
@@ -17,16 +17,22 @@
 (defn high-card [[hand _]]
   (mapv #(str/index-of ORDER %) hand))
 
+(defn safe-sort [coll]
+  (if coll (sort coll) [0]))
+
 (defn hand-type [[hand _]]
-  (let [freq-vals (->> (frequencies hand) (vals) (sort))]
+  (let [freqs (frequencies hand)
+        js (get freqs \J)
+        freq-vals (-> (dissoc freqs \J) (vals) (safe-sort) (reverse) (vec)
+                      (update 0 + (or js 0)))]
     (condp = freq-vals
-        [5] 7
-        [1 4] 6
-        [2 3] 5
-        [1 1 3] 4
-        [1 2 2] 3
-        [1 1 1 2] 2
-        [1 1 1 1 1] 1)))
+      [5] 7
+      [4 1] 6
+      [3 2] 5
+      [3 1 1] 4
+      [2 2 1] 3
+      [2 1 1 1] 2
+      [1 1 1 1 1] 1)))
 
 (comment
   (with-open [rdr (io/reader "resources/day_7.txt")]
@@ -36,10 +42,10 @@
          (sort-by high-card)
          (sort-by hand-type)
          (map-indexed (fn [i [hand bid]]
-                        (prn i hand (hand-type [hand nil]))
+                        #_(prn i hand (hand-type [hand nil]))
                         (* (inc i) (Integer. bid))))
          (apply +)))
-  ;; => 249204891
+  ;; => 249666369
 
   ;;
   )
