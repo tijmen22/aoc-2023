@@ -1,7 +1,6 @@
-(ns aoc.day-9 
-  (:require
-   [clojure.java.io :as io]
-   [clojure.string :as str]))
+(ns aoc.day-9
+  (:require [clojure.java.io :as io]
+            [clojure.string :as str]))
 
 (def EXAMPLE
   ["0 3 6 9 12 15"
@@ -12,7 +11,7 @@
   (->> (str/split l #" ") (map #(Integer. %))))
 
 (defn- difference [[a b]]
-  (- b a))
+  (- a b))
 
 (defn- differences [values]
   (map difference (partition 2 1 values)))
@@ -21,17 +20,18 @@
   (loop [values measurements
          prediction 0]
     (let [diffs (differences values)]
-      (if (every? zero? diffs) (+ (last measurements) prediction)
-          (recur (differences values) (+ prediction (last diffs)))))))
+      (if (every? zero? diffs) (+ (first measurements) prediction)
+          (recur (differences values) (+ prediction (first diffs)))))))
 
 (comment
   (with-open [rdr (io/reader "resources/day_9.txt")]
     (->> (line-seq rdr)
+         #_EXAMPLE
          (into [])
          (map parse-line)
          (map reduce-differences)
          (apply +)))
-  ;; => 1696140818
+  ;; => 1152
 
   ;;
   )
