@@ -30,10 +30,12 @@
                          (set (map first galaxies)))})
 
 (defn- distance [g1 g2 {:keys [rows cols]}]
-  (+ (count (filter #(and (> % (min (first g1) (first g2)))
-                          (< % (max (first g1) (first g2)))) rows))
-     (count (filter #(and (> % (min (second g1) (second g2)))
-                          (< % (max (second g1) (second g2)))) cols))
+  (+ (* (count (filter #(and (> % (min (first g1) (first g2)))
+                             (< % (max (first g1) (first g2)))) rows))
+        999999)
+     (* (count (filter #(and (> % (min (second g1) (second g2)))
+                             (< % (max (second g1) (second g2)))) cols))
+        999999)
      (abs (- (first g1) (first g2)))
      (abs (- (second g1) (second g2)))))
 
@@ -55,7 +57,6 @@
        (apply +))))
   ;; => 692506533832
   ;; => 9918828
-
 
 ;;
   )
